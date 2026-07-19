@@ -18,7 +18,8 @@
  }
 
  int deptExists(int id){
-    FILE *fp;
+    return 1;
+    /*FILE *fp;
     Dept d1;
     fp=fopen(dept_path,"rb");
     while(fread(&d1,sizeof(d1),1,fp)){
@@ -28,5 +29,5 @@
         }
     }
     fclose(fp);
-    return 0;
+    return 0;*/
  }

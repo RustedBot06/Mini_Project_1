@@ -23,7 +23,7 @@ int addEmployee(){
         name[strcspn(name, "\n")] = '\0';
         printf("Enter department ID:");
         scanf("%d", &deptID);
-        if(1){ //deptExists(deptID)
+        if(deptExists(deptID)){ 
             printf("Enter basic salary:");
             scanf("%f", &sal);
             if(sal>0){
@@ -103,7 +103,7 @@ int searchEmployee(){
             int did=0;
             printf("\nEnter Department ID to search:");
             scanf("%d",&id);
-            if(1){//deptExists(id)
+            if(deptExists(did)){
                 printf("\n--------------------------------------------------------\n");
                 printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
                 printf("--------------------------------------------------------\n");
@@ -169,13 +169,18 @@ int updateEmployee(){
                         int did=0;
                         printf("\nEnter new dept ID:");
                         scanf("%d",&did);
-                        e1.deptId=did;
+                        if(deptExists(did)){
+                            e1.deptId=did;}
+                        else{printf("Department Id doesn't exist.");}
                         break;
                     case 2:
                         float sal=0.0;
                         printf("\nEnter new Salary:");
                         scanf("%f",&sal);
-                        e1.basicSalary=sal;
+                        if(sal>0.0)
+                            e1.basicSalary=sal;
+                        else 
+                            printf("Salary must be greater than 0");
                         break;
                     default:
                         printf("\nEnter valid choice");
