@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include"employee.h"
+#include"fileutil.h"
 
 int addEmployee(){
     FILE *fp;
@@ -15,21 +16,36 @@ int addEmployee(){
     float sal;
     printf("\nEnter employee ID:");
     scanf("%d", &ID);
-    getchar();
-    printf("Enter Employee Name:");
-    fgets(name,sizeof(name),stdin);
-    name[strcspn(name, "\n")] = '\0';
-    printf("Enter department ID:");
-    scanf("%d", &deptID);
-    printf("Enter basic salary:");
-    scanf("%f", &sal);
-    e1.empId=ID;
-    strcpy(e1.name,name);
-    e1.deptId=deptID;
-    e1.basicSalary=sal;
-    fwrite(&e1, sizeof(e1),1,fp);
+    if(!employeeExists(ID)){
+        getchar();
+        printf("Enter Employee Name:");
+        fgets(name,sizeof(name),stdin);
+        name[strcspn(name, "\n")] = '\0';
+        printf("Enter department ID:");
+        scanf("%d", &deptID);
+        if(1){ //deptExists(deptID)
+            printf("Enter basic salary:");
+            scanf("%f", &sal);
+            if(sal>0){
+                e1.empId=ID;
+                strcpy(e1.name,name);
+                e1.deptId=deptID;
+                e1.basicSalary=sal;
+                fwrite(&e1, sizeof(e1),1,fp);
+                printf("Record added successfully");
+            }
+            else{
+                printf("Salary must be > 0.");
+            }
+        }
+        else{
+            printf("Department ID not found.");
+        }
+    }
+    else{
+        printf("\nEmployee ID already exists.");
+    }
     fclose(fp);
-    printf("Record added successfully");
     return 0;
 }
 
@@ -41,7 +57,7 @@ int displayAllEmployees(){
     printf("Cannot open file.\n");
     return 1;
     }
-    printf("--------------------------------------------------------\n");
+    printf("\n--------------------------------------------------------\n");
     printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
     printf("--------------------------------------------------------\n");
     while(fread(&e1,sizeof(e1),1,fp)){
@@ -67,29 +83,39 @@ int searchEmployee(){
             int id=0;
             printf("\nEnter employee ID to search:");
             scanf("%d",&id);
-            printf("--------------------------------------------------------\n");
-            printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
-            printf("--------------------------------------------------------\n");
-            while(fread(&e1,sizeof(e1),1,fp)){
-                if(e1.empId==id){
-                    printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
-                    found =1;
-                    break;
+            if(employeeExists(id)){
+                printf("\n--------------------------------------------------------\n");
+                printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
+                printf("--------------------------------------------------------\n");
+                while(fread(&e1,sizeof(e1),1,fp)){
+                    if(e1.empId==id){
+                        printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+                        found =1;
+                        break;
+                    }
                 }
+            }
+            else{
+                printf("\nEmployee ID doesn't exist.");
             }
             break;
         case 2:
             int did=0;
             printf("\nEnter Department ID to search:");
             scanf("%d",&id);
-            printf("--------------------------------------------------------\n");
-            printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
-            printf("--------------------------------------------------------\n");
-            while(fread(&e1,sizeof(e1),1,fp)){
-                if(e1.deptId==did){
-                    found=1;
-                    printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+            if(1){//deptExists(id)
+                printf("\n--------------------------------------------------------\n");
+                printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
+                printf("--------------------------------------------------------\n");
+                while(fread(&e1,sizeof(e1),1,fp)){
+                    if(e1.deptId==did){
+                        found=1;
+                        printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+                    }
                 }
+            }
+            else{
+                printf("Department ID non-existent in records.");
             }
             break;
         case 3:
@@ -98,14 +124,19 @@ int searchEmployee(){
             scanf("%f",&min);
             printf("\nEnter Higher Value of Salary Search Range:");
             scanf("%f",&max);
-            printf("--------------------------------------------------------\n");
-            printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
-            printf("--------------------------------------------------------\n");
-            while(fread(&e1,sizeof(e1),1,fp)){
-                if((e1.basicSalary>=min)&&(e1.basicSalary<=max)){
-                    found=1;
-                    printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+            if((max>=min)&&(max>0.0)&&(min>=0.0)){
+                printf("\n--------------------------------------------------------\n");
+                printf("%-8s %-20s %-10s %-12s\n","ID","Name","Dept. ID","Basic Salary");
+                printf("--------------------------------------------------------\n");
+                while(fread(&e1,sizeof(e1),1,fp)){
+                    if((e1.basicSalary>=min)&&(e1.basicSalary<=max)){
+                        found=1;
+                        printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+                    }
                 }
+            }
+            else{
+                printf("Please enter proper min and max values.");
             }
             break;
         default: 
@@ -114,6 +145,7 @@ int searchEmployee(){
             break;
     }
     if(found!=1){printf("No record found\n");}
+    fclose(fp);
     return 0;
 }
 
@@ -123,38 +155,45 @@ int updateEmployee(){
     FILE *fpr;
     FILE *fpw;
     fpr=fopen(path,"rb");
-    fpw=fopen("../data/temp.dat","ab");
+    fpw=fopen("../data/temp.dat","wb");
     printf("\nEnter employee ID to modify:");
     scanf("%d",&eid);
-    while(fread(&e1,sizeof(e1),1,fpr)){
-        if(e1.empId==eid){
-            int c=0;
-            printf("\n1. Modify Department ID\n2. Modify Basic Salary\nEnter Choice:");
-            scanf("%d",&c);
-            switch(c){
-                case 1:
-                    int did=0;
-                    printf("\nEnter new dept ID:");
-                    scanf("%d",&did);
-                    e1.deptId=did;
-                    break;
-                case 2:
-                    float sal=0.0;
-                    printf("\nEnter new Salary:");
-                    scanf("%f",&sal);
-                    e1.basicSalary=sal;
-                    break;
-                default:
-                    printf("\nEnter valid choice");
-                    break;
+    if(employeeExists(eid)){
+        while(fread(&e1,sizeof(e1),1,fpr)){
+            if(e1.empId==eid){
+                int c=0;
+                printf("\n1. Modify Department ID\n2. Modify Basic Salary\nEnter Choice:");
+                scanf("%d",&c);
+                switch(c){
+                    case 1:
+                        int did=0;
+                        printf("\nEnter new dept ID:");
+                        scanf("%d",&did);
+                        e1.deptId=did;
+                        break;
+                    case 2:
+                        float sal=0.0;
+                        printf("\nEnter new Salary:");
+                        scanf("%f",&sal);
+                        e1.basicSalary=sal;
+                        break;
+                    default:
+                        printf("\nEnter valid choice");
+                        break;
+                }
             }
+            fwrite(&e1,sizeof(e1),1,fpw);
         }
-        fwrite(&e1,sizeof(e1),1,fpw);
+        fclose(fpw);
+        fclose(fpr);
+        remove(path);                
+        rename("../data/temp.dat", path); 
     }
-    fclose(fpw);
-    fclose(fpr);
-    remove(path);                
-    rename("../data/temp.dat", path); 
+    else{
+        fclose(fpw);
+        fclose(fpr);
+        printf("\nEmployee ID not found.");
+    }
     return 0;
 }
 
@@ -164,25 +203,32 @@ int deleteEmployee(){
     FILE *fpr;
     FILE *fpw;
     fpr=fopen(path,"rb");
-    fpw=fopen("../data/temp.dat","ab");
+    fpw=fopen("../data/temp.dat","wb");
     printf("\nEnter employee ID to delete:");
     scanf("%d",&eid);
-    while(fread(&e1,sizeof(e1),1,fpr)){
-        if(e1.empId!=eid){
-            fwrite(&e1,sizeof(e1),1,fpw);
+    if(employeeExists(eid)){
+        while(fread(&e1,sizeof(e1),1,fpr)){
+            if(e1.empId!=eid){
+                fwrite(&e1,sizeof(e1),1,fpw);
+            }
         }
+        fclose(fpw);
+        fclose(fpr);
+        remove(path);                
+        rename("../data/temp.dat", path); 
     }
-    fclose(fpw);
-    fclose(fpr);
-    remove(path);                
-    rename("../data/temp.dat", path); 
+    else{
+        fclose(fpw);
+        fclose(fpr);
+        printf("\nEmployee ID not Found.");
+    }
     return 0;
 }
 
 int main(){
-    //addEmployee(path);
+    //addEmployee();
     displayAllEmployees();
-    //searchEmployee(path);
-    //updateEmployee(path);
-    return 0;
+    //searchEmployee();
+    //updateEmployee();
+    //deleteEmployee();
 }
