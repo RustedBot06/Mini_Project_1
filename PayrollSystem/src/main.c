@@ -1,4 +1,6 @@
 #include<stdio.h>
+#include"employee.h"
+#include"department.h"
 
 int main(){
     printf("===============================\n");
@@ -57,6 +59,7 @@ int main(){
             break;
             case 2://Employee Menu
                 x=0;
+                int a=0;
                 printf("\n-----------------\n");
                 printf("1. Add Employee\n"
                        "2. Display Employee\n"
@@ -69,18 +72,39 @@ int main(){
                 switch(x){
                     case 1: //Add Employee UnderDev
                         printf("Adding Employee");
+                        printf("\nEnter the number of records to add:");
+                        scanf("%d",&a);
+                        for(int i=0;i<a;i++){
+                            addEmployee();
+                        }
                         break;
                     case 2://Display Employee UnderDev
                         printf("Display Employee");
+                        displayAllEmployees();
                         break;
                     case 3://Search Employee UnderDev
                         printf("Search Employee");
+                        printf("Enter number of searches to perform:");
+                        scanf("%d",&a);
+                        for(int i=0;i<a;i++){
+                            searchEmployee();
+                        }
                         break;
                     case 4://Update Employee UnderDev
                         printf("Update Employee");
+                        printf("Enter number of modifications to be done:");
+                        scanf("%d",&a);
+                        for(int i=0;i<a;i++){
+                            updateEmployee();
+                        }
                         break;
                     case 5://Delete Employee UnderDev
                         printf("Delete Employee");
+                        printf("Enter number of records to delete:");
+                        scanf("%d",&a);
+                        for(int i=0;i<a;i++){
+                            deleteEmployee();
+                        }
                         break;
                     case 6:
                         //No message for backing, intentional

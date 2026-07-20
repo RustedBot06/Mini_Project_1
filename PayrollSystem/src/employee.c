@@ -62,6 +62,7 @@ int displayAllEmployees(){
     printf("--------------------------------------------------------\n");
     while(fread(&e1,sizeof(e1),1,fp)){
     printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+    printf("--------------------------------------------------------\n");
     }
     fclose(fp);
     return 0;
@@ -90,6 +91,7 @@ int searchEmployee(){
                 while(fread(&e1,sizeof(e1),1,fp)){
                     if(e1.empId==id){
                         printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+                        printf("--------------------------------------------------------\n");
                         found =1;
                         break;
                     }
@@ -111,6 +113,7 @@ int searchEmployee(){
                     if(e1.deptId==did){
                         found=1;
                         printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+                        printf("--------------------------------------------------------\n");
                     }
                 }
             }
@@ -132,6 +135,7 @@ int searchEmployee(){
                     if((e1.basicSalary>=min)&&(e1.basicSalary<=max)){
                         found=1;
                         printf("%-8d %-20s %-10d %-12f\n", e1.empId,e1.name,e1.deptId,e1.basicSalary);
+                        printf("--------------------------------------------------------\n");
                     }
                 }
             }
@@ -182,7 +186,7 @@ int updateEmployee(){
                         else 
                             printf("Salary must be greater than 0");
                         break;
-                    default:
+                    default: 
                         printf("\nEnter valid choice");
                         break;
                 }
@@ -228,12 +232,4 @@ int deleteEmployee(){
         printf("\nEmployee ID not Found.");
     }
     return 0;
-}
-
-int main(){
-    //addEmployee();
-    displayAllEmployees();
-    //searchEmployee();
-    //updateEmployee();
-    //deleteEmployee();
 }
